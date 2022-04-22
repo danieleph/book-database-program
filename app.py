@@ -148,7 +148,7 @@ def add_csv():
             price = clean_price(row[3])
             book_in_db = session.query(Book).filter(Book.title==row[0]).one_or_none()
             if book_in_db == None:
-                new_book = Book(title=title, author=author, published_date=date, price=price)
+                new_book = Book(title=row[0], author=row[1], published_date=date, price=price)
                 session.add(new_book)
     session.commit()
 
@@ -173,7 +173,7 @@ def app():
                 price = clean_price(price)
                 if type(price) == int:
                     price_error = False
-            new_book = Book(title=title, author=author, published_date=date, price=price)
+            new_book = Book(title=title, author=author, published_date=published, price=price)
             session.add(new_book)
             session.commit()
             print('Book Added')
@@ -219,7 +219,17 @@ def app():
                 time.sleep(1.5)
         elif choice == '4':
             #book analysis
-            pass
+            oldest_book = session.query(Book).order_by(Book.published_date).first()
+            newest_book = session.query(Book).order_by(Book.published_date.desc()).first()
+            total_books = session.query(Book).count()
+            python_books = session.query(Book).filter(Book.title.like('%Python%')).count()
+            print(f'''\n***** BOOK ANALYSIS ***
+                    \rOldest Book: {oldest_book}
+                    \rNewest Book: {newest_book}
+                    \rTotal Books: {total_books}
+                    \rPython Books: {python_books}''')
+            input('\nPress enter to return to the main menu.')
+
         else:
             print('GOODBYE')
             app_running=False
